@@ -1,15 +1,15 @@
 (function(){
   const reviews={
-    'Le Bistrot de Gaetan':{rating:'4,7',count:'5.655',quote:'“The best French bistro in Santiago, without a doubt!”',source:'Google'},
-    'Baco':{rating:'4,5',count:'6.861',quote:'“This bustling cosmopolitan restaurant provided excellent food, service and atmosphere.”',source:'Google'},
-    'Parigó':{rating:null,count:null,quote:null,source:'Google'},
-    'Franklin Klunssen':{rating:null,count:null,quote:null,source:'Google'},
-    'Piso Uno':{rating:'4,4',count:'2.269',quote:'“Delicious! Highly recommend. We went for an early dinner and it was delicious and quiet for our family.”',source:'Google'},
-    'Benito Vicente':{rating:'5,0',count:'87',quote:null,source:'Google'},
-    'Maillard':{rating:'4,7',count:'575',quote:'“Maillard was one of the highlights of our time in Santiago.”',source:'Google'},
-    'Caoba':{rating:'4,6',count:'790',quote:'“Realmente espectacular la comida, no esperábamos tanto. Posiblemente el mejor crudo que hemos comido.”',source:'Google'},
-    'Fuente Alemana':{rating:'4,5',count:'7.769',quote:'“El mejor chacarero que he comido en el último tiempo.”',source:'Google'},
-    'Mestizo':{rating:'4,4',count:'6.115',quote:'“Lugar perfecto para ir a cerrar la semana luego de un paseo por el parque Bicentenario.”',source:'Google'}
+    'Le Bistrot de Gaetan':{rating:'4,7',count:'5.655',quote:'“The best French bistro in Santiago, without a doubt!”'},
+    'Baco':{rating:'4,5',count:'6.861',quote:'“This bustling cosmopolitan restaurant provided excellent food, service and atmosphere.”'},
+    'Parigó':{rating:null,count:null,quote:null},
+    'Franklin Klunssen':{rating:null,count:null,quote:null},
+    'Piso Uno':{rating:'4,4',count:'2.269',quote:'“Delicious! Highly recommend. We went for an early dinner and it was delicious and quiet for our family.”'},
+    'Benito Vicente':{rating:'5,0',count:'87',quote:null},
+    'Maillard':{rating:'4,7',count:'575',quote:'“Maillard was one of the highlights of our time in Santiago.”'},
+    'Caoba':{rating:'4,6',count:'790',quote:'“Realmente espectacular la comida, no esperábamos tanto. Posiblemente el mejor crudo que hemos comido.”',address:'Alonso de Córdova 4156',map:'https://www.google.com/maps/search/?api=1&query=Caoba+Bar+Alonso+de+Cordova+4156+Vitacura'},
+    'Fuente Alemana':{rating:'4,5',count:'7.769',quote:'“El mejor chacarero que he comido en el último tiempo.”'},
+    'Mestizo':{rating:'4,4',count:'6.115',quote:'“Lugar perfecto para ir a cerrar la semana luego de un paseo por el parque Bicentenario.”'}
   };
 
   function render(){
@@ -33,14 +33,13 @@
       const key=title.textContent.trim();
       const data=reviews[key];
       if(!data) return;
+      if(data.address){const address=card.querySelector('.address');if(address)address.textContent=data.address;}
+      if(data.map){const links=[...card.querySelectorAll('a')];const mapLink=links.find(a=>a.textContent.trim()==='MAPA');if(mapLink)mapLink.href=data.map;}
       const box=document.createElement('div');
       box.className='google-box';
-      let score='';
-      if(data.rating){
-        score=`<div class="google-score"><span class="google-star">★</span>${data.rating}<span class="google-count">(${data.count} reseñas)</span></div>`;
-      }else{
-        score='<div class="google-score"><span class="google-count">Dato pendiente</span></div>';
-      }
+      const score=data.rating
+        ? `<div class="google-score"><span class="google-star">★</span>${data.rating}<span class="google-count">(${data.count} reseñas)</span></div>`
+        : '<div class="google-score"><span class="google-count">Dato pendiente</span></div>';
       const review=data.quote
         ? `<p class="google-review">${data.quote}</p>`
         : `<p class="google-review-note">Todavía no hay una reseña de Google recuperable de forma fiable para mostrar aquí. No inventamos reseñas.</p>`;
