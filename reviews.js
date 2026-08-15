@@ -31,7 +31,9 @@
     `;
     document.head.appendChild(style);
 
-    document.querySelectorAll('.card').forEach(card=>{
+    const grid=document.querySelector('.grid');
+    const cards=[...document.querySelectorAll('.card')];
+    cards.forEach(card=>{
       const title=card.querySelector('h2');
       if(!title) return;
       const key=title.textContent.trim();
@@ -51,6 +53,29 @@
       box.innerHTML=`<div class="google-head"><span class="google-label">Google Business</span>${score}</div>${review}<div class="google-source">Fuente: Google · tocar para abrir Google Maps</div>`;
       card.insertBefore(box,card.querySelector('.address'));
     });
+
+    // Orden editorial: primero mayor puntuación; en empate, mayor cantidad de reseñas.
+    // Los locales sin datos verificables de Google quedan al final.
+    if(grid){
+      cards.sort((a,b)=>{
+        const aName=a.querySelector('h2')?.textContent.trim()||'';
+        const bName=b.querySelector('h2')?.textContent.trim()||'';
+        const aData=reviews[aName]||{};
+        const bData=reviews[bName]||{};
+        const aRating=aData.rating?parseFloat(aData.rating.replace(',','.')):-1;
+        const bRating=bData.rating?parseFloat(bData.rating.replace(',','.')):-1;
+        if(bRating!==aRating) return bRating-aRating;
+        const aCount=aData.count?parseInt(aData.count.replace(/\./g,''),10):0;
+        const bCount=bData.count?parseInt(bData.count.replace(/\./g,''),10):0;
+        if(bCount!==aCount) return bCount-aCount;
+        return aName.localeCompare(bName,'es');
+      });
+      cards.forEach((card,index)=>{
+        const number=card.querySelector('.num');
+        if(number) number.textContent=String(index+1).padStart(2,'0');
+        grid.appendChild(card);
+      });
+    }
   }
 
   if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',render); else render();
