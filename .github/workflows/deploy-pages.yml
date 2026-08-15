@@ -29,12 +29,13 @@ jobs:
           cp index.html _site/index.html
           cp reviews.js _site/reviews.js
           cp v2-visual.js _site/v2-visual.js
+          cp photos.js _site/photos.js
           if [ -z "$GOOGLE_MAPS_API_KEY" ]; then
             echo "GOOGLE_MAPS_API_KEY is not configured" >&2
             exit 1
           fi
           sed -i "s|__GOOGLE_MAPS_API_KEY__|$GOOGLE_MAPS_API_KEY|g" _site/index.html
-          sed -i 's|</body>|<script src="reviews.js"></script><script src="v2-visual.js"></script></body>|' _site/index.html
+          sed -i 's|</body>|<script src="reviews.js"></script><script src="v2-visual.js"></script><script src="photos.js"></script></body>|' _site/index.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
