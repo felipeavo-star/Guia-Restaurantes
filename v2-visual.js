@@ -43,10 +43,8 @@
   function enhance(){
     document.querySelectorAll('.card').forEach((card,i)=>{
       if(card.querySelector('.rank-badge'))return;
-      const num=card.querySelector('.num');
-      const title=card.querySelector('h2');
+      const badge=document.createElement('div');badge.className='rank-badge';badge.textContent='RANKING '+String(i+1).padStart(2,'0');card.appendChild(badge);
       const score=card.querySelector('.google-score');
-      const badge=document.createElement('div');badge.className='rank-badge';badge.textContent='SELECCIÓN '+String(i+1).padStart(2,'0');card.appendChild(badge);
       if(score && !card.querySelector('.score-ribbon')){const r=document.createElement('div');r.className='score-ribbon';r.innerHTML='<span class="dot"></span> PUNTUACIÓN GOOGLE';const gb=card.querySelector('.google-box');if(gb)gb.querySelector('.google-head').after(r)}
     });
     const mapHead=document.querySelector('.map-head');
