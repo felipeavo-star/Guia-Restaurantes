@@ -1,0 +1,56 @@
+(function(){
+  const s=document.createElement('style');
+  s.textContent=`
+  :root{--gold:#facc15;--ink:#080808;--panel:#101010;--line:#252525}
+  .wrap{max-width:1240px!important}
+  .hero{padding:38px 0 18px!important;position:relative}
+  .hero:after{content:'GUÍA INDEPENDIENTE';position:absolute;right:0;top:40px;border:1px solid #303030;border-radius:999px;padding:8px 12px;font-size:9px;font-weight:900;letter-spacing:.16em;color:#71717a}
+  .hero h1{max-width:900px!important}
+  .hero p{font-size:15px!important;max-width:720px!important}
+  .map-wrap{border-radius:28px!important;box-shadow:0 24px 70px rgba(0,0,0,.42)!important}
+  .map-head{padding:20px 22px!important}
+  .map-title{font-size:11px!important;color:#facc15!important}
+  .filters{position:sticky;top:0;z-index:20;padding:12px 0;margin:0 0 24px!important;background:rgba(8,8,8,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+  .filter{transition:.18s ease!important;padding:11px 17px!important}
+  .grid{grid-template-columns:repeat(auto-fill,minmax(310px,1fr))!important;gap:16px!important}
+  .card{position:relative;overflow:hidden;min-height:390px!important;border-radius:24px!important;padding:22px!important;transition:transform .22s ease,border-color .22s ease,box-shadow .22s ease!important}
+  .card:hover{transform:translateY(-4px);border-color:#3a3a3a;box-shadow:0 18px 45px rgba(0,0,0,.35)}
+  .card .num{font-size:28px!important;line-height:1;color:#303030!important;letter-spacing:-.05em}
+  .card h2{font-size:30px!important;margin:22px 0 8px!important}
+  .commune{background:#191919;border:1px solid #303030;border-radius:999px;padding:6px 9px}
+  .tip{font-size:13px!important;color:#c4c4c8!important}
+  .google-box{background:#0b0b0b;border:1px solid #202020;border-radius:16px;padding:13px 14px!important;margin-top:17px!important;transition:.18s ease}
+  .google-box:hover{border-color:#3a3a3a}
+  .google-head{margin-bottom:8px!important}
+  .google-label{font-size:9px!important}
+  .google-score{font-size:16px!important}
+  .google-star{font-size:17px!important}
+  .google-review-link{padding:6px 7px!important;margin:0!important}
+  .google-review{font-size:12px!important}
+  .address{padding-top:16px!important;font-size:11px!important}
+  .actions{margin-top:13px!important}
+  .btn{padding:10px 12px!important;transition:.18s ease!important}
+  .btn:hover{transform:translateY(-2px)!important}
+  .btn.alt:hover{border-color:#555;background:#252525}
+  .rank-badge{position:absolute;right:20px;top:20px;color:#71717a;font-size:9px;font-weight:900;letter-spacing:.15em;text-transform:uppercase}
+  .score-ribbon{display:inline-flex;align-items:center;gap:7px;margin-top:12px;color:#facc15;font-size:11px;font-weight:900;letter-spacing:.04em}
+  .score-ribbon .dot{width:5px;height:5px;border-radius:50%;background:#facc15}
+  .footer{padding-top:10px}
+  @media(max-width:700px){.hero:after{position:static;display:inline-block;margin-top:18px}.hero{padding-top:22px!important}.hero h1{font-size:42px!important}.filters{margin-left:-20px!important;margin-right:-20px!important;padding-left:20px!important;padding-right:20px!important;overflow-x:auto;flex-wrap:nowrap!important}.filter{white-space:nowrap}.grid{grid-template-columns:1fr!important}.card{min-height:350px!important}}
+  `;
+  document.head.appendChild(s);
+
+  function enhance(){
+    document.querySelectorAll('.card').forEach((card,i)=>{
+      if(card.querySelector('.rank-badge'))return;
+      const num=card.querySelector('.num');
+      const title=card.querySelector('h2');
+      const score=card.querySelector('.google-score');
+      const badge=document.createElement('div');badge.className='rank-badge';badge.textContent='SELECCIÓN '+String(i+1).padStart(2,'0');card.appendChild(badge);
+      if(score && !card.querySelector('.score-ribbon')){const r=document.createElement('div');r.className='score-ribbon';r.innerHTML='<span class="dot"></span> PUNTUACIÓN GOOGLE';const gb=card.querySelector('.google-box');if(gb)gb.querySelector('.google-head').after(r)}
+    });
+    const mapHead=document.querySelector('.map-head');
+    if(mapHead && !document.querySelector('.map-note')){const n=document.createElement('div');n.className='map-note';n.textContent='Explora. Elige. Paga la cuenta.';n.style='font-size:9px;color:#71717a;text-transform:uppercase;letter-spacing:.14em;margin-top:8px';const sub=mapHead.querySelector('.map-sub');if(sub)sub.appendChild(n)}
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',enhance);else enhance();
+})();
