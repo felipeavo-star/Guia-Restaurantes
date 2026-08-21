@@ -1,0 +1,6 @@
+# Salida del build: la genera Vercel en cada deploy.
+dist/
+
+# Configuración local de herramientas.
+.claude/
+node_modules/

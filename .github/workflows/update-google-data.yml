@@ -33,8 +33,8 @@ jobs:
       - name: Commit changes
         run: |
           git config user.name 'github-actions[bot]'
-          git config user.email '41898282+users.noreply.github.com'
-          git add reviews-data.js
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add restaurants.json
           if git diff --cached --quiet; then
             echo 'No changes to publish.'
             exit 0
