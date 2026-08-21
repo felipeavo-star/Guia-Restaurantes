@@ -27,7 +27,6 @@
    --gold sobre negro (8.18:1) y --gold-ink sobre papel (5.51:1).
    ============================================================ */
 :root{
-  /* Secciones oscuras */
   --ink:#0B0A09;
   --ink-2:#131110;
   --ink-3:#1B1815;
@@ -35,28 +34,26 @@
   --on-ink-muted:#9A938A;
   --line-ink:#2A2622;
 
-  /* Secciones claras */
   --paper:#F7F4EE;
   --paper-2:#FFFFFF;
   --on-paper:#14110F;
   --on-paper-muted:#6B635A;
   --line-paper:#DED7CC;
 
-  /* Acento */
   --gold:#C9A227;
   --gold-ink:#7A5F10;
 
   --serif:"Playfair Display",Georgia,"Times New Roman",serif;
   --sans:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;
 
-  --maxw:1280px;
+  --maxw:1320px;
   --gut:20px;
-
-  /* Escala espaciosa (density 4/10) */
   --s-1:8px; --s-2:16px; --s-3:24px; --s-4:40px; --s-5:64px; --s-6:96px;
 
-  --ease:cubic-bezier(.16,1,.3,1);      /* expo.out */
+  --ease:cubic-bezier(.16,1,.3,1);
   --ease-soft:cubic-bezier(.4,0,.2,1);
+
+  --bar:70px;          /* alto de la barra de filtros pegada arriba */
 }
 
 *{box-sizing:border-box}
@@ -72,16 +69,13 @@ a{color:inherit}
 .section--paper :focus-visible{outline-color:var(--gold-ink)}
 .sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 
-/* ============================================================ Secciones */
 .section{position:relative}
 .section--dark{background:var(--ink);color:var(--on-ink)}
 .section--paper{background:var(--paper);color:var(--on-paper)}
 .inner{max-width:var(--maxw);margin:0 auto;padding:0 var(--gut)}
 
-/* Cintillo de sección, tipo revista */
 .section-mark{
-  display:flex;align-items:center;gap:14px;
-  padding:var(--s-4) 0 var(--s-2);
+  display:flex;align-items:center;gap:14px;padding:var(--s-4) 0 var(--s-2);
   font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;
 }
 .section-mark::after{content:"";flex:1;height:1px;background:currentColor;opacity:.22}
@@ -89,7 +83,6 @@ a{color:inherit}
 .section--dark .section-mark{color:var(--gold)}
 .section--paper .section-mark{color:var(--gold-ink)}
 
-/* ============================================================ Barra de progreso */
 .progress{
   position:fixed;top:0;left:0;height:2px;width:100%;transform:scaleX(0);transform-origin:0 50%;
   background:var(--gold);z-index:90;will-change:transform;
@@ -97,141 +90,119 @@ a{color:inherit}
 
 /* ============================================================ Portada */
 .cover{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:var(--s-5) 0 var(--s-4)}
-.kicker{
-  display:flex;align-items:center;gap:12px;
-  color:var(--gold);font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase;
-}
+.kicker{display:flex;align-items:center;gap:12px;color:var(--gold);font-size:10px;font-weight:600;letter-spacing:.24em;text-transform:uppercase}
 .kicker::before{content:"";width:38px;height:1px;background:var(--gold)}
 
 .cover h1{
   font-family:var(--serif);font-weight:400;
-  font-size:clamp(44px,11.5vw,150px);line-height:.92;letter-spacing:-.025em;
-  margin:var(--s-3) 0 0;
+  font-size:clamp(44px,11.5vw,150px);line-height:.92;letter-spacing:-.025em;margin:var(--s-3) 0 0;
 }
 .cover h1 .line{display:block;overflow:hidden}
 .cover h1 em{font-style:italic;color:var(--gold)}
-/* Cada carácter se anima por separado (ver splitChars en app.js) */
 .cover h1 .ch{display:inline-block;will-change:transform,opacity}
 
-.cover-foot{
-  display:flex;flex-wrap:wrap;gap:var(--s-4);align-items:flex-start;
-  margin-top:var(--s-4);padding-top:var(--s-3);border-top:1px solid var(--line-ink);
-}
-.creed{
-  flex:1 1 420px;max-width:60ch;margin:0;
-  color:var(--on-ink-muted);font-size:15px;line-height:1.7;
-}
+.cover-foot{display:flex;flex-wrap:wrap;gap:var(--s-4);align-items:flex-start;margin-top:var(--s-4);padding-top:var(--s-3);border-top:1px solid var(--line-ink)}
+.creed{flex:1 1 420px;max-width:60ch;margin:0;color:var(--on-ink-muted);font-size:15px;line-height:1.7}
 .creed strong{color:var(--on-ink);font-weight:500}
-.creed::first-letter{
-  float:left;font-family:var(--serif);font-size:3.6em;line-height:.82;
-  padding:6px 12px 0 0;color:var(--gold);
-}
+.creed::first-letter{float:left;font-family:var(--serif);font-size:3.6em;line-height:.82;padding:6px 12px 0 0;color:var(--gold)}
 .stats{display:flex;gap:var(--s-4)}
 .stat-n{font-family:var(--serif);font-size:44px;line-height:1;color:var(--on-ink)}
 .stat-l{margin-top:6px;font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--on-ink-muted)}
 
-.scroll-cue{
-  margin-top:var(--s-4);display:flex;align-items:center;gap:10px;
-  font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--on-ink-muted);
-}
+.scroll-cue{margin-top:var(--s-4);display:flex;align-items:center;gap:10px;font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--on-ink-muted)}
 .scroll-cue span{display:block;width:1px;height:34px;background:linear-gradient(var(--gold),transparent);animation:cue 2.2s var(--ease-soft) infinite}
 @keyframes cue{0%{transform:scaleY(0);transform-origin:0 0}45%{transform:scaleY(1);transform-origin:0 0}55%{transform:scaleY(1);transform-origin:0 100%}100%{transform:scaleY(0);transform-origin:0 100%}}
 
-/* ============================================================ Mapa */
-.map-section{padding-bottom:var(--s-5)}
-.map-shell{border:1px solid var(--line-ink);background:var(--ink-2);overflow:hidden}
-.map-bar{
-  display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;justify-content:space-between;
-  padding:16px 18px;border-bottom:1px solid var(--line-ink);
-}
-.map-bar h2{font-family:var(--serif);font-weight:400;font-size:22px;margin:0}
-.map-bar p{margin:0;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--on-ink-muted)}
-.map{height:60vh;min-height:320px;max-height:560px;background:var(--ink-3)}
-.map-fallback{display:none;padding:22px 18px;color:var(--on-ink-muted);font-size:13px;line-height:1.7}
-.map-shell[data-state="error"] .map{display:none}
-.map-shell[data-state="error"] .map-fallback{display:block}
-
 /* ============================================================ Filtros */
 .filters-wrap{position:sticky;top:0;z-index:40;background:var(--paper);border-bottom:1px solid var(--line-paper)}
-.filters{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:14px 0}
+.filters{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:13px 0}
 .filters::-webkit-scrollbar{display:none}
 .filter{
   flex:0 0 auto;display:inline-flex;align-items:center;min-height:44px;padding:0 18px;
-  border:1px solid var(--line-paper);border-radius:999px;background:transparent;
-  color:var(--on-paper-muted);font-family:inherit;font-size:11px;font-weight:600;
-  letter-spacing:.14em;text-transform:uppercase;cursor:pointer;
+  border:1px solid var(--line-paper);border-radius:999px;background:transparent;color:var(--on-paper-muted);
+  font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;cursor:pointer;
   transition:color .25s var(--ease-soft),border-color .25s var(--ease-soft),background .25s var(--ease-soft);
 }
 .filter:hover{color:var(--on-paper);border-color:var(--on-paper-muted)}
 .filter[aria-pressed="true"]{background:var(--on-paper);border-color:var(--on-paper);color:var(--paper)}
 
-.tally{
-  display:flex;align-items:baseline;gap:10px;padding:var(--s-3) 0 var(--s-2);
-  font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--on-paper-muted);
-}
+/* ============================================================ Dos columnas: lista + mapa */
+.layout{display:grid;grid-template-columns:1fr;gap:var(--s-3);padding-bottom:var(--s-6)}
+
+.tally{display:flex;align-items:baseline;gap:10px;padding:var(--s-3) 0 var(--s-2);font-size:10px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--on-paper-muted)}
 .tally b{font-family:var(--serif);font-weight:400;font-size:34px;letter-spacing:0;color:var(--on-paper)}
 
-/* ============================================================ Grilla editorial */
-.grid{
-  display:grid;grid-template-columns:1fr;gap:var(--s-3);
-  margin:0;padding:0 0 var(--s-6);list-style:none;
-}
+/* El mapa es un bloque oscuro sobre el papel: contrasta y pesa menos que antes. */
+.col-map{min-width:0}
+.map-shell{background:var(--ink);border:1px solid var(--ink);overflow:hidden}
+.map-bar{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line-ink)}
+.map-bar h2{font-family:var(--serif);font-weight:400;font-size:17px;margin:0;color:var(--on-ink)}
+.map-bar p{margin:0;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--on-ink-muted)}
+.map{height:240px;background:var(--ink-3)}
+.map-fallback{display:none;padding:18px 15px;color:var(--on-ink-muted);font-size:12px;line-height:1.7}
+.map-shell[data-state="error"] .map{display:none}
+.map-shell[data-state="error"] .map-fallback{display:block}
+
+/* ============================================================ Fichas */
+.grid{display:grid;grid-template-columns:1fr;gap:var(--s-3);margin:0;padding:0;list-style:none}
 .card{
-  position:relative;display:flex;flex-direction:column;
+  position:relative;display:flex;flex-direction:column;min-width:0;
   background:var(--paper-2);border:1px solid var(--line-paper);
-  /* estado inicial del reveal; .is-in lo lleva a su lugar */
   opacity:0;transform:translateY(26px);
-  transition:opacity .7s var(--ease),transform .7s var(--ease),border-color .3s var(--ease-soft);
+  transition:opacity .7s var(--ease),transform .7s var(--ease),border-color .3s var(--ease-soft),box-shadow .4s var(--ease-soft);
 }
 .card.is-in{opacity:1;transform:none}
-.card:hover{border-color:var(--on-paper-muted)}
+.card:hover{border-color:#C4B9A8;box-shadow:0 18px 40px rgba(20,17,15,.09)}
 
-.shot{position:relative;overflow:hidden;aspect-ratio:4/3;background:#E9E4DA}
+/* --- Foto con matiz: duotono cálido que unifica material de origen desigual --- */
+.shot{position:relative;overflow:hidden;aspect-ratio:1/1;background:var(--ink-2)}
 .shot:empty{display:none}
 .shot img{
   width:100%;height:112%;object-fit:cover;
-  transform:translateY(var(--par,0));
-  transition:transform .9s var(--ease-soft),filter .5s var(--ease-soft);
-  filter:saturate(.92);
+  transform:translateY(var(--par,0)) scale(var(--zoom,1));
+  filter:grayscale(.32) sepia(.14) saturate(.82) contrast(1.06) brightness(.96);
+  transition:transform .9s var(--ease-soft),filter .6s var(--ease-soft);
 }
-.card:hover .shot img{filter:saturate(1.04)}
-.shot figcaption{
-  position:absolute;right:8px;bottom:6px;z-index:2;
-  font-size:9px;color:rgba(255,255,255,.82);text-shadow:0 1px 4px rgba(0,0,0,.7);
+/* Velo dorado en soft-light: da el tono cálido sin teñir de plano. */
+.shot::before{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:var(--gold);mix-blend-mode:soft-light;opacity:.28;
+  transition:opacity .6s var(--ease-soft);
 }
+/* Sombra inferior: asienta la foto y deja legible el crédito. */
+.shot::after{
+  content:"";position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(180deg,rgba(11,10,9,.10) 0%,rgba(11,10,9,0) 38%,rgba(11,10,9,.52) 100%);
+}
+.card:hover .shot img{--zoom:1.04;filter:grayscale(0) sepia(0) saturate(1.03) contrast(1) brightness(1)}
+.card:hover .shot::before{opacity:.10}
+
+.shot figcaption{position:absolute;right:9px;bottom:7px;z-index:3;font-size:9px;color:rgba(255,255,255,.8);text-shadow:0 1px 4px rgba(0,0,0,.75)}
 .shot figcaption a{text-decoration:none}
 .shot figcaption a:hover{text-decoration:underline}
 
-.card-body{display:flex;flex-direction:column;flex:1;padding:22px}
-.folio{
-  display:flex;align-items:baseline;justify-content:space-between;gap:14px;
-  padding-bottom:14px;border-bottom:1px solid var(--line-paper);
-}
-.folio .n{font-family:var(--serif);font-size:30px;line-height:1;color:var(--line-paper)}
+/* Cuando Google no entrega foto, un panel tipográfico en vez de un hueco. */
+.shot--none{display:flex;align-items:center;justify-content:center;background:var(--ink-2)}
+.shot--none::before,.shot--none::after{display:none}
+.shot--none .initial{font-family:var(--serif);font-size:clamp(56px,14vw,104px);line-height:1;color:var(--gold);opacity:.5}
+
+.card-body{display:flex;flex-direction:column;flex:1;padding:20px}
+.folio{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding-bottom:13px;border-bottom:1px solid var(--line-paper)}
+.folio .n{font-family:var(--serif);font-size:28px;line-height:1;color:var(--line-paper)}
 .folio .where{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--gold-ink)}
 
-.card h3{
-  font-family:var(--serif);font-weight:400;font-size:clamp(26px,4.6vw,34px);
-  line-height:1.06;letter-spacing:-.02em;margin:18px 0 8px;
-}
+.card h3{font-family:var(--serif);font-weight:400;font-size:clamp(25px,4.2vw,31px);line-height:1.06;letter-spacing:-.02em;margin:16px 0 8px}
 .kind{font-size:9px;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:var(--on-paper-muted)}
-.blurb{margin:14px 0 0;font-size:14.5px;line-height:1.65;color:#3A3430}
+.blurb{margin:13px 0 0;font-size:14.5px;line-height:1.65;color:#3A3430}
 
-.stamp{
-  align-self:flex-start;margin-top:16px;padding:6px 11px;
-  border:1px solid var(--gold-ink);color:var(--gold-ink);
-  font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase;
-}
+.stamp{align-self:flex-start;margin-top:15px;padding:6px 11px;border:1px solid var(--gold-ink);color:var(--gold-ink);font-size:9px;font-weight:600;letter-spacing:.18em;text-transform:uppercase}
 
-.facts{margin:18px 0 0;padding:16px 0 0;border-top:1px solid var(--line-paper);display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:13px}
+.facts{margin:17px 0 0;padding:15px 0 0;border-top:1px solid var(--line-paper);display:grid;grid-template-columns:auto 1fr;gap:8px 16px;font-size:13px}
 .facts dt{color:var(--on-paper-muted);font-size:9px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;padding-top:2px}
 .facts dd{margin:0}
 .facts .money{color:var(--gold-ink);font-weight:600;letter-spacing:.08em}
 
-.score{
-  margin-top:16px;padding-top:14px;border-top:1px solid var(--line-paper);
-  display:flex;align-items:center;justify-content:space-between;gap:12px;text-decoration:none;
-}
+.score{margin-top:15px;padding-top:13px;border-top:1px solid var(--line-paper);display:flex;align-items:center;justify-content:space-between;gap:12px;text-decoration:none}
 .score-src{font-size:9px;font-weight:600;letter-spacing:.16em;text-transform:uppercase;color:var(--on-paper-muted)}
 .score-v{display:flex;align-items:center;gap:7px;font-size:15px;font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap;transition:color .25s var(--ease-soft)}
 .score:hover .score-v{color:var(--gold-ink)}
@@ -240,73 +211,64 @@ a{color:inherit}
 .score-pending{font-size:11px;color:var(--on-paper-muted)}
 .score-when{margin-top:5px;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--on-paper-muted)}
 
-.acts{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}
+.acts{display:flex;flex-wrap:wrap;gap:7px;margin-top:17px}
 .act{
   display:inline-flex;align-items:center;min-height:44px;padding:0 15px;text-decoration:none;
   border:1px solid var(--on-paper);background:transparent;color:var(--on-paper);
   font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;
-  transition:background .25s var(--ease-soft),color .25s var(--ease-soft);
+  transition:background .25s var(--ease-soft),color .25s var(--ease-soft),border-color .25s var(--ease-soft);
 }
 .act:hover{background:var(--on-paper);color:var(--paper)}
 .act--key{background:var(--on-paper);color:var(--paper)}
 .act--key:hover{background:var(--gold-ink);border-color:var(--gold-ink);color:#fff}
-.walkin{
-  display:inline-flex;align-items:center;min-height:44px;padding:0 15px;
-  border:1px dashed var(--line-paper);color:var(--on-paper-muted);
-  font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;
-}
+.walkin{display:inline-flex;align-items:center;min-height:44px;padding:0 15px;border:1px dashed var(--line-paper);color:var(--on-paper-muted);font-size:10px;font-weight:600;letter-spacing:.15em;text-transform:uppercase}
 
 .empty{display:none;padding:var(--s-5) 0;text-align:center;color:var(--on-paper-muted);font-family:var(--serif);font-size:22px}
 
 /* ============================================================ Cierre */
 .outro{padding:var(--s-5) 0 var(--s-4)}
-.pull{
-  font-family:var(--serif);font-weight:400;font-style:italic;
-  font-size:clamp(24px,4.4vw,44px);line-height:1.2;letter-spacing:-.015em;
-  max-width:22ch;margin:var(--s-2) 0 var(--s-4);color:var(--on-ink);
-}
+.pull{font-family:var(--serif);font-weight:400;font-style:italic;font-size:clamp(24px,4.4vw,44px);line-height:1.2;letter-spacing:-.015em;max-width:22ch;margin:var(--s-2) 0 var(--s-4);color:var(--on-ink)}
 .pull em{color:var(--gold);font-style:italic}
 .fine{max-width:64ch;margin:0;color:var(--on-ink-muted);font-size:14px;line-height:1.75}
 .fine strong{color:var(--on-ink);font-weight:500}
-.colophon{
-  margin-top:var(--s-5);padding-top:var(--s-2);border-top:1px solid var(--line-ink);
-  display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;
-  font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--on-ink-muted);
-}
+.colophon{margin-top:var(--s-5);padding-top:var(--s-2);border-top:1px solid var(--line-ink);display:flex;flex-wrap:wrap;gap:8px 20px;justify-content:space-between;font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--on-ink-muted)}
 
-/* ============================================================ Popup del mapa */
 .gm-popup{font-family:var(--sans);color:#111;min-width:160px;line-height:1.45}
 .gm-popup strong{font-size:14px;display:block}
 .gm-popup small{display:block;margin-top:3px;color:#555}
 
-/* ============================================================ Reveal genérico */
 [data-reveal]{opacity:0;transform:translateY(20px);transition:opacity .8s var(--ease),transform .8s var(--ease)}
 [data-reveal].is-in{opacity:1;transform:none}
 
 /* ============================================================ Breakpoints */
-@media(min-width:768px){
-  :root{--gut:36px}
-  .grid{grid-template-columns:repeat(6,1fr);gap:var(--s-3)}
-  .card{grid-column:span 3}
-  .card--wide{grid-column:span 6}
-
-  /* Ficha de apertura: horizontal, como la entrada de un reportaje */
-  .card--lead{grid-column:span 6;flex-direction:row;align-items:stretch}
-  .card--lead .shot{flex:1 1 56%;aspect-ratio:auto;min-height:380px}
-  .card--lead .card-body{flex:1 1 44%;justify-content:center;padding:36px}
-  .card--lead h3{font-size:clamp(38px,4.4vw,58px)}
-  .card--lead .blurb{font-size:16px}
-
-  .cover-foot{flex-wrap:nowrap}
+@media(min-width:640px){
+  :root{--gut:28px}
+  .grid{grid-template-columns:repeat(2,1fr)}
+  .card--lead,.card--wide{grid-column:1/-1}
+  .map{height:280px}
 }
+
 @media(min-width:1024px){
-  .grid{gap:var(--s-4) var(--s-3)}
-  .card{grid-column:span 2}
-  .card--wide{grid-column:span 3}
-  .card--lead{grid-column:span 6}
+  :root{--gut:36px}
+
+  /* Lista a la izquierda, mapa fijo a la derecha y más chico. */
+  .layout{grid-template-columns:minmax(0,2.1fr) minmax(260px,1fr);gap:var(--s-4);align-items:start}
+  .col-list{grid-column:1;grid-row:1;min-width:0}
+  .col-map{grid-column:2;grid-row:1;position:sticky;top:calc(var(--bar) + 20px)}
+  .map{height:min(58vh,520px)}
+
+  /* La ficha de apertura sigue siendo horizontal, dentro de su columna. */
+  .card--lead{flex-direction:row;align-items:stretch}
+  .card--lead .shot{flex:0 0 44%;aspect-ratio:auto}
+  .card--lead .card-body{flex:1 1 56%;justify-content:center;padding:28px}
+  .card--lead h3{font-size:clamp(30px,3vw,40px)}
 }
 
-/* ============================================================ Movimiento reducido */
+@media(min-width:1280px){
+  .grid{gap:var(--s-3)}
+  .card--lead .card-body{padding:34px}
+}
+
 @media(prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   *,*::before,*::after{transition-duration:.01ms!important;animation-duration:.01ms!important;animation-iteration-count:1!important}
@@ -354,27 +316,10 @@ a{color:inherit}
   </div>
 </header>
 
-<!-- ===================================================== II · EL MAPA -->
-<section class="section section--dark map-section" aria-labelledby="mapTitle">
-  <div class="inner">
-    <p class="section-mark"><span class="roman">II</span> El mapa</p>
-    <div class="map-shell" id="mapShell" data-state="loading" data-reveal>
-      <div class="map-bar">
-        <h2 id="mapTitle">Dónde están los locales</h2>
-        <p>Google Maps · modo oscuro</p>
-      </div>
-      <div id="map" class="map" role="application" aria-label="Mapa de Santiago con los restaurantes de la guía"></div>
-      <p class="map-fallback">
-        El mapa no se pudo cargar en este momento. Cada ficha incluye un enlace directo a Google Maps.
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- ===================================================== III · LOS LOCALES -->
+<!-- ===================================================== II · LOS LOCALES -->
 <section class="section section--paper" aria-labelledby="listTitle">
   <div class="inner">
-    <p class="section-mark"><span class="roman">III</span> Los locales</p>
+    <p class="section-mark"><span class="roman">II</span> Los locales</p>
     <h2 class="sr-only" id="listTitle">Listado de restaurantes</h2>
   </div>
 
@@ -385,16 +330,36 @@ a{color:inherit}
   </div>
 
   <div class="inner">
-    <p class="tally" id="tally" role="status" aria-live="polite"></p>
-    <ul class="grid" id="grid"></ul>
-    <p class="empty" id="empty">No hay locales en esta comuna todavía.</p>
+    <div class="layout">
+
+      <!-- En móvil el mapa va arriba; en escritorio pasa a la columna derecha. -->
+      <aside class="col-map" aria-labelledby="mapTitle">
+        <div class="map-shell" id="mapShell" data-state="loading" data-reveal>
+          <div class="map-bar">
+            <h2 id="mapTitle">El mapa</h2>
+            <p>Modo oscuro</p>
+          </div>
+          <div id="map" class="map" role="application" aria-label="Mapa de Santiago con los restaurantes de la guía"></div>
+          <p class="map-fallback">
+            El mapa no se pudo cargar. Cada ficha incluye un enlace directo a Google Maps.
+          </p>
+        </div>
+      </aside>
+
+      <div class="col-list">
+        <p class="tally" id="tally" role="status" aria-live="polite"></p>
+        <ul class="grid" id="grid"></ul>
+        <p class="empty" id="empty">No hay locales en esta comuna todavía.</p>
+      </div>
+
+    </div>
   </div>
 </section>
 
-<!-- ===================================================== IV · EL CRITERIO -->
+<!-- ===================================================== III · EL CRITERIO -->
 <footer class="section section--dark outro">
   <div class="inner">
-    <p class="section-mark"><span class="roman">IV</span> El criterio</p>
+    <p class="section-mark"><span class="roman">III</span> El criterio</p>
 
     <blockquote class="pull">Si hay fila es porque es bueno. <em>No porque regalan algo.</em></blockquote>
 

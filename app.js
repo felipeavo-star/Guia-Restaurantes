@@ -296,8 +296,10 @@
 
     var vivos = todas.filter(function (c) { return c.style.display !== 'none'; });
     vivos.forEach(function (c, i) {
+      /* La primera abre a lo ancho; después una cada siete, para que la
+         retícula de dos columnas no se vuelva monótona. */
       if (i === 0) c.classList.add('card--lead');
-      else if (vivos.length > 9 && (i === 7 || i === 8)) c.classList.add('card--wide');
+      else if (vivos.length > 6 && (i + 1) % 7 === 0) c.classList.add('card--wide');
     });
   }
 
@@ -454,10 +456,26 @@
     try { sessionStorage.setItem(clave(r), JSON.stringify(v)); } catch (e) { /* sin storage */ }
   }
 
+  /* Si Google no entrega foto, la ficha muestra la inicial en Playfair
+     en vez de un hueco: la retícula no se rompe y no inventamos una imagen. */
+  function pintarSinFoto(r) {
+    var card = document.getElementById('card-' + r.id);
+    var hueco = card && card.querySelector('[data-photo]');
+    if (!hueco || hueco.dataset.done) return;
+    hueco.dataset.done = '1';
+    hueco.classList.add('shot--none');
+    var ini = document.createElement('span');
+    ini.className = 'initial';
+    ini.setAttribute('aria-hidden', 'true');
+    ini.textContent = r.name.trim().charAt(0).toUpperCase();
+    hueco.appendChild(ini);
+  }
+
   function pintarFoto(r, url, autor, autorUrl) {
     var card = document.getElementById('card-' + r.id);
     var hueco = card && card.querySelector('[data-photo]');
-    if (!hueco || !url || hueco.dataset.done) return;
+    if (!hueco || hueco.dataset.done) return;
+    if (!url) return pintarSinFoto(r);
     hueco.dataset.done = '1';
 
     var img = new Image();
@@ -497,7 +515,7 @@
       });
 
       var place = res.places && res.places[0];
-      if (!place) return;
+      if (!place) return pintarSinFoto(r);
 
       var photo = place.photos && place.photos[0];
       var attr = photo && photo.authorAttributions && photo.authorAttributions[0];
@@ -515,6 +533,7 @@
       pintarFoto(r, payload.photoUrl, payload.creditName, payload.creditUrl);
     } catch (error) {
       console.warn('Places no respondió para ' + r.name + ':', error.message);
+      pintarSinFoto(r);
     }
   }
 
