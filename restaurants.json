@@ -1,0 +1,19 @@
+[
+  {"name":"Le Bistrot de Gaetan","address":"Santa Magdalena 80, Providencia, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Le+Bistrot+de+Gaetan+Santa+Magdalena+80+Providencia"},
+  {"name":"Baco","address":"Nueva de Lyon 113, Providencia, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Baco+Nueva+de+Lyon+113+Providencia"},
+  {"name":"Parigó","address":"Reyes Lavalle 3310, Las Condes, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Parigo+Reyes+Lavalle+3310+Las+Condes"},
+  {"name":"Franklin Klunssen","address":"Fernando de Arguello 7430, Vitacura, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Franklin+Klunssen+Fernando+de+Arguello+7430+Vitacura"},
+  {"name":"Piso Uno","address":"Santa Magdalena 116, Providencia, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Piso+Uno+Santa+Magdalena+116+Providencia"},
+  {"name":"Benito Vicente","address":"Francisco Bilbao 707, Providencia, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Benito+Vicente+Francisco+Bilbao+707+Providencia"},
+  {"name":"Maillard","address":"Nueva Costanera 3802, Vitacura, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Maillard+Nueva+Costanera+3802+Vitacura"},
+  {"name":"Caoba","address":"Alonso de Cordova 4156, Vitacura, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Caoba+Alonso+de+Cordova+4156+Vitacura"},
+  {"name":"Fuente Alemana","address":"Pedro de Valdivia 210, Providencia, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Fuente+Alemana+Pedro+de+Valdivia+210+Providencia"},
+  {"name":"Mestizo","address":"Av Bicentenario 4050, Vitacura, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Mestizo+Av+Bicentenario+4050+Vitacura"},
+  {"name":"Huggo Comedor","address":"Dr. Luis Middleton 1698, Providencia, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Huggo+Comedor+Dr+Luis+Middleton+1698+Providencia"},
+  {"name":"TAKEYA","address":"Holanda 067 Local 109A, Providencia, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=TAKEYA+Holanda+067+Local+109A+Providencia"},
+  {"name":"Guksi","address":"Nueva Los Leones 140, Providencia, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Guksi+Nueva+Los+Leones+140+Providencia"},
+  {"name":"Nusantara","address":"Marcel Duhaut 2995, Providencia, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Nusantara+Marcel+Duhaut+2995+Providencia"},
+  {"name":"Caos Comedor Café","address":"Santa Beatriz 223, Providencia, Santiago, Chile","maps":"https://maps.app.goo.gl/Wp5pNuWNsEUj1ZT26?g_st=ic"},
+  {"name":"Da Dino","address":"Alameda 737, Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Da+Dino+Alameda+737+Santiago"},
+  {"name":"Haowacl","address":"Santiago, Chile","maps":"https://www.google.com/maps/search/?api=1&query=Haowacl+Santiago+Chile"}
+]
