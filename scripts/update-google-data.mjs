@@ -1,78 +1,104 @@
+/*
+ * Actualiza puntuación, cantidad de reseñas y coordenadas desde Google Places.
+ * Se ejecuta una vez por semana (.github/workflows/update-google-data.yml).
+ *
+ * Regla: si el restaurante ya tiene place_id, se consulta por place_id. La búsqueda
+ * por texto solo se usa la primera vez, para no confundir establecimientos distintos.
+ *
+ * Nunca escribe una nota ni un conteo inventado: si Google no responde, deja el valor anterior.
+ */
 import fs from 'node:fs/promises';
 
 const API_KEY = process.env.GOOGLE_PLACES_API_KEY;
-if (!API_KEY) throw new Error('Missing GOOGLE_PLACES_API_KEY');
+if (!API_KEY) throw new Error('Falta GOOGLE_PLACES_API_KEY.');
 
+const FIELDS = 'id,displayName,rating,userRatingCount,location,formattedAddress';
 const restaurants = JSON.parse(await fs.readFile('restaurants.json', 'utf8'));
-const currentSource = await fs.readFile('reviews-data.js', 'utf8');
-const jsonText = currentSource
-  .replace(/^window\.GUIDE_REVIEWS\s*=\s*/, '')
-  .replace(/;\s*$/, '');
-const current = JSON.parse(jsonText);
-
-const endpoint = 'https://places.googleapis.com/v1/places:searchText';
 const updatedAt = new Date().toISOString();
 
-async function searchPlace(restaurant) {
-  const response = await fetch(endpoint, {
+async function request(url, options) {
+  const response = await fetch(url, options);
+  if (!response.ok) {
+    throw new Error(`Google API ${response.status}: ${(await response.text()).slice(0, 300)}`);
+  }
+  return response.json();
+}
+
+function detailsByPlaceId(placeId) {
+  return request(`https://places.googleapis.com/v1/places/${encodeURIComponent(placeId)}`, {
+    headers: {
+      'X-Goog-Api-Key': API_KEY,
+      'X-Goog-FieldMask': FIELDS,
+      'Accept-Language': 'es-CL'
+    }
+  });
+}
+
+async function searchByText(restaurant) {
+  const data = await request('https://places.googleapis.com/v1/places:searchText', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'X-Goog-Api-Key': API_KEY,
-      'X-Goog-FieldMask': 'places.id,places.displayName,places.rating,places.userRatingCount,places.formattedAddress'
+      'X-Goog-FieldMask': FIELDS.split(',').map((f) => `places.${f}`).join(',')
     },
     body: JSON.stringify({
-      textQuery: `${restaurant.name}, ${restaurant.address}`,
+      textQuery: `${restaurant.name}, ${restaurant.addressFull || restaurant.address}`,
+      includedType: 'restaurant',
       languageCode: 'es',
       regionCode: 'CL',
       maxResultCount: 1
     })
   });
-
-  if (!response.ok) {
-    const body = await response.text();
-    throw new Error(`Google API ${response.status}: ${body}`);
-  }
-
-  const data = await response.json();
   return data.places?.[0] ?? null;
 }
 
-let changed = false;
+let changed = 0;
 let failures = 0;
 
 for (const restaurant of restaurants) {
-  const previous = current[restaurant.name] ?? { maps: restaurant.maps };
-
   try {
-    const place = await searchPlace(restaurant);
+    const place = restaurant.placeId
+      ? await detailsByPlaceId(restaurant.placeId)
+      : await searchByText(restaurant);
+
     if (!place) {
-      console.warn(`No Google Place found: ${restaurant.name}`);
+      console.warn(`Sin resultado en Google: ${restaurant.name}`);
       failures++;
       continue;
     }
 
-    const next = {
-      rating: typeof place.rating === 'number' ? place.rating : previous.rating ?? null,
-      count: Number.isInteger(place.userRatingCount) ? place.userRatingCount : previous.count ?? null,
-      maps: restaurant.maps,
-      placeId: place.id ?? previous.placeId ?? null,
-      updatedAt
-    };
+    const before = JSON.stringify([
+      restaurant.googleRating, restaurant.googleReviewCount, restaurant.placeId
+    ]);
 
-    if (JSON.stringify(next) !== JSON.stringify(previous)) changed = true;
-    current[restaurant.name] = next;
-    console.log(`${restaurant.name}: ${next.rating ?? '-'} / ${next.count ?? '-'} (${place.displayName?.text ?? 'unknown'})`);
+    if (typeof place.rating === 'number') restaurant.googleRating = place.rating;
+    if (Number.isInteger(place.userRatingCount)) restaurant.googleReviewCount = place.userRatingCount;
+    if (place.id) restaurant.placeId = place.id;
+    if (place.location) {
+      restaurant.lat = place.location.latitude;
+      restaurant.lng = place.location.longitude;
+    }
+    restaurant.updatedAt = updatedAt;
+
+    const after = JSON.stringify([
+      restaurant.googleRating, restaurant.googleReviewCount, restaurant.placeId
+    ]);
+    if (before !== after) changed++;
+
+    console.log(
+      `${restaurant.name}: ${restaurant.googleRating ?? '-'} / ${restaurant.googleReviewCount ?? '-'}` +
+      ` · ${place.displayName?.text ?? '?'}`
+    );
   } catch (error) {
     failures++;
-    console.error(`Failed: ${restaurant.name}: ${error.message}`);
+    console.error(`Falló ${restaurant.name}: ${error.message}`);
   }
 }
 
 if (failures === restaurants.length) {
-  throw new Error('Every Google Places lookup failed; refusing to overwrite data.');
+  throw new Error('Todas las consultas a Google fallaron; no se sobrescriben los datos.');
 }
 
-const output = `window.GUIDE_REVIEWS = ${JSON.stringify(current, null, 2)};\n`;
-await fs.writeFile('reviews-data.js', output, 'utf8');
-console.log(changed ? 'Google data changed.' : 'Google data unchanged.');
+await fs.writeFile('restaurants.json', JSON.stringify(restaurants, null, 2) + '\n', 'utf8');
+console.log(`Listo · ${changed} con cambios · ${failures} sin respuesta.`);
