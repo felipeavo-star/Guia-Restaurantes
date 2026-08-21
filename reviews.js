@@ -14,7 +14,7 @@
     'TAKEYA':{rating:'4,9',count:'128',quote:null,source:'Google',maps:'https://www.google.com/maps/search/?api=1&query=TAKEYA+Holanda+067+Local+109A+Providencia'},
     'Guksi':{rating:'3,3',count:'3',quote:null,source:'Google',maps:'https://www.google.com/maps/search/?api=1&query=Guksi+Nueva+Los+Leones+140+Providencia'},
     'Nusantara':{rating:'4,9',count:'8',quote:null,source:'Google',maps:'https://www.google.com/maps/search/?api=1&query=Nusantara+Marcel+Duhaut+2995+Providencia'},
-    'Caos Comedor Café':{rating:'5,0',count:'2',quote:null,source:'Google',maps:'https://www.google.com/maps/search/?api=1&query=Caos+Comedor+Café+Santa+Beatriz+223+Providencia'},
+    'Caos Comedor Café':{rating:'4,8',count:'143',quote:null,source:'Google',maps:'https://maps.app.goo.gl/Wp5pNuWNsEUj1ZT26?g_st=ic'},
     'Da Dino':{rating:'4,5',count:'52',quote:null,source:'Google',maps:'https://www.google.com/maps/search/?api=1&query=Da+Dino+Alameda+737+Santiago'},
     'Haowacl':{rating:null,count:null,quote:null,source:'Google',maps:'https://www.google.com/maps/search/?api=1&query=Haowacl+Santiago+Chile'}
   };
@@ -24,7 +24,7 @@
     {name:'TAKEYA',comuna:'Providencia',tag:'Japonés · Soba',tip:'Pequeño restaurante japonés especializado en soba, con una propuesta sencilla y muy enfocada.',address:'Holanda 067, Local 109A',price:'$$',ideal:'🍜 Antojo · 👀 Descubrir',badge:'🍜 ESPECIALISTA'},
     {name:'Guksi',comuna:'Providencia',tag:'Coreano · Noodles',tip:'Restaurante de cocina coreana centrado en noodles y preparaciones caseras.',address:'Av. Nueva Los Leones 0140',price:'$$',ideal:'🍜 Casual · 👀 Descubrir',badge:'🇰🇷 COCINA COREANA'},
     {name:'Nusantara',comuna:'Providencia',tag:'Indonesia · Asiática',tip:'Un pequeño local dedicado a la cocina tradicional de Indonesia, con platos poco habituales en Santiago.',address:'Marcel Duhaut 2995',price:'$',ideal:'👀 Descubrir · 🍽️ Comida diaria',badge:'🌏 IMPERDIBLE DE NICHO'},
-    {name:'Caos Comedor Café',comuna:'Providencia',tag:'Cocina de autor · Café',tip:'Cocina de memoria, productos de temporada y café de especialidad en un formato íntimo.',address:'Santa Beatriz 223',price:'$$$',ideal:'☕ Café · 🍽️ Almuerzo',badge:'🔥 VALE LA VISITA'},
+    {name:'Caos Comedor Café',comuna:'Providencia',tag:'Cafetería · Comedor',tip:'Comedor y café de barrio con cocina, pastelería y café de especialidad.',address:'Santa Beatriz 223',price:'$$',ideal:'☕ Café · 🍽️ Almuerzo',badge:'🔥 VALE LA VISITA'},
     {name:'Da Dino',comuna:'Santiago Centro',tag:'Pizzería · Italiana',tip:'Pizzería histórica de Santiago, abierta desde 1956, conocida por sus pizzas y preparaciones italianas.',address:'Alameda 737',price:'$',ideal:'🍕 Amigos · 👨‍👩‍👧 Familia',badge:'🏛️ CLÁSICO DE SANTIAGO'},
     {name:'Haowacl',comuna:'Por confirmar',tag:'Datos por verificar',tip:'Restaurante solicitado para la guía. No encontramos una coincidencia verificable con este nombre en Google Business.',address:'Dirección por confirmar',price:'—',ideal:'👀 Por verificar',badge:'⏳ POR VERIFICAR'}
   ];
