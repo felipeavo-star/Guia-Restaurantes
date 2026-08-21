@@ -12,7 +12,7 @@
     'Mestizo':{rating:'4,4',count:'6.115',quote:'“Lugar perfecto para ir a cerrar la semana luego de un paseo por el parque Bicentenario.”',source:'Google',maps:'https://www.google.com/maps/search/?api=1&query=Mestizo+Av+Bicentenario+4050+Vitacura'},
     'Huggo Comedor':{rating:'4,7',count:'209',quote:null,source:'Google',maps:'https://www.google.com/maps/search/?api=1&query=Huggo+Comedor+Dr+Luis+Middleton+1698+Providencia'},
     'TAKEYA':{rating:'4,9',count:'128',quote:null,source:'Google',maps:'https://www.google.com/maps/search/?api=1&query=TAKEYA+Holanda+067+Local+109A+Providencia'},
-    'Guksi':{rating:'3,3',count:'3',quote:null,source:'Google',maps:'https://www.google.com/maps/search/?api=1&query=Guksi+Nueva+Los+Leones+140+Providencia'},
+    'Guksi':{rating:'4,3',count:'358',quote:null,source:'Google',maps:'https://www.google.com/maps/search/?api=1&query=Guksi+Nueva+Los+Leones+140+Providencia'},
     'Nusantara':{rating:'4,9',count:'8',quote:null,source:'Google',maps:'https://www.google.com/maps/search/?api=1&query=Nusantara+Marcel+Duhaut+2995+Providencia'},
     'Caos Comedor Café':{rating:'4,8',count:'143',quote:null,source:'Google',maps:'https://maps.app.goo.gl/Wp5pNuWNsEUj1ZT26?g_st=ic'},
     'Da Dino':{rating:'4,5',count:'52',quote:null,source:'Google',maps:'https://www.google.com/maps/search/?api=1&query=Da+Dino+Alameda+737+Santiago'},
@@ -22,7 +22,7 @@
   const newRestaurants=[
     {name:'Huggo Comedor',comuna:'Providencia',tag:'Cocina de autor · Chilena moderna',tip:'Cocina de autor con producto estacional y sabores chilenos, en un pequeño comedor de barrio.',address:'Dr. Luis Middleton 1698',price:'$$$',ideal:'🍻 Amigos · ☀️ Comidas diarias',badge:'🔥 VALE LA VISITA'},
     {name:'TAKEYA',comuna:'Providencia',tag:'Japonés · Soba',tip:'Pequeño restaurante japonés especializado en soba, con una propuesta sencilla y muy enfocada.',address:'Holanda 067, Local 109A',price:'$$',ideal:'🍜 Antojo · 👀 Descubrir',badge:'🍜 ESPECIALISTA'},
-    {name:'Guksi',comuna:'Providencia',tag:'Coreano · Noodles',tip:'Restaurante de cocina coreana centrado en noodles y preparaciones caseras.',address:'Av. Nueva Los Leones 0140',price:'$$',ideal:'🍜 Casual · 👀 Descubrir',badge:'🇰🇷 COCINA COREANA'},
+    {name:'Guksi',comuna:'Providencia',tag:'Coreano · Noodles',tip:'Restaurante coreano con noodles y preparaciones de cocina coreana.',address:'Av. Nueva Los Leones 0140',price:'$$',ideal:'🍜 Casual · 👀 Descubrir',badge:'🇰🇷 COCINA COREANA'},
     {name:'Nusantara',comuna:'Providencia',tag:'Indonesia · Asiática',tip:'Un pequeño local dedicado a la cocina tradicional de Indonesia, con platos poco habituales en Santiago.',address:'Marcel Duhaut 2995',price:'$',ideal:'👀 Descubrir · 🍽️ Comida diaria',badge:'🌏 IMPERDIBLE DE NICHO'},
     {name:'Caos Comedor Café',comuna:'Providencia',tag:'Cafetería · Comedor',tip:'Comedor y café de barrio con cocina, pastelería y café de especialidad.',address:'Santa Beatriz 223',price:'$$',ideal:'☕ Café · 🍽️ Almuerzo',badge:'🔥 VALE LA VISITA'},
     {name:'Da Dino',comuna:'Santiago Centro',tag:'Pizzería · Italiana',tip:'Pizzería histórica de Santiago, abierta desde 1956, conocida por sus pizzas y preparaciones italianas.',address:'Alameda 737',price:'$',ideal:'🍕 Amigos · 👨‍👩‍👧 Familia',badge:'🏛️ CLÁSICO DE SANTIAGO'},
