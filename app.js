@@ -2,20 +2,22 @@
  * Guía definitiva de restaurantes · Santiago
  *
  * Fuente única de datos: restaurants.json (inyectado en el build como window.GUIA_DATA).
- * Este archivo hace todo: fichas, filtros, mapa, fotos y movimiento.
+ * Render del índice, filtros por comuna y movimiento.
+ *
+ * No usa Google Maps ni Places en el navegador: cada ficha enlaza a Google Maps
+ * y las notas las actualiza el job semanal del servidor.
  *
  * El movimiento es nativo (CSS + IntersectionObserver + Web Animations API).
- * No hay librerías de animación: prefers-reduced-motion desactiva todo.
+ * prefers-reduced-motion lo desactiva por completo.
  */
 (function () {
   'use strict';
 
   var COMUNAS = ['Providencia', 'Vitacura', 'Las Condes', 'Santiago Centro'];
-  var SANTIAGO = { lat: -33.4189, lng: -70.5945 };
   var EASE = 'cubic-bezier(.16,1,.3,1)';
 
   var quieto = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  var state = { list: [], filter: 'all', map: null, markers: {}, info: null };
+  var state = { list: [], filter: 'all' };
 
   /* ================================================================ utils */
 
@@ -38,7 +40,7 @@
 
   /* ============================================================ movimiento */
 
-  /* Parte cada línea del titular en caracteres animables, sin romper el <em>
+  /* Parte el titular en caracteres animables sin romper el <em>
      ni el texto que leen los lectores de pantalla. */
   function splitChars(root) {
     root.setAttribute('aria-label', root.textContent.replace(/\s+/g, ' ').trim());
@@ -68,22 +70,16 @@
 
   function animarTitular() {
     var title = document.getElementById('coverTitle');
-    if (!title) return;
-    if (quieto) return;
+    if (!title || quieto) return;
 
-    var chars = splitChars(title);
-    chars.forEach(function (ch, i) {
+    splitChars(title).forEach(function (ch, i) {
       ch.animate(
-        [
-          { opacity: 0, transform: 'translateY(0.7em) rotate(2deg)' },
-          { opacity: 1, transform: 'none' }
-        ],
+        [{ opacity: 0, transform: 'translateY(0.7em) rotate(2deg)' }, { opacity: 1, transform: 'none' }],
         { duration: 620, delay: i * 16, easing: EASE, fill: 'backwards' }
       );
     });
   }
 
-  /* Revela un elemento cuando entra en pantalla. Una sola vez. */
   var revelador = null;
   function observarReveal(el, delay) {
     if (quieto || !('IntersectionObserver' in window)) return el.classList.add('is-in');
@@ -96,36 +92,13 @@
           setTimeout(function () { entry.target.classList.add('is-in'); }, d);
           revelador.unobserve(entry.target);
         });
-      }, { rootMargin: '0px 0px -8% 0px', threshold: 0.06 });
+      }, { rootMargin: '0px 0px -6% 0px', threshold: 0.05 });
     }
 
     el.dataset.revealDelay = delay || 0;
     revelador.observe(el);
   }
 
-  /* Parallax de las fotos: la imagen mide 112% de alto y se desplaza dentro de ese sobrante. */
-  var parallaxEls = [];
-  var ticking = false;
-
-  function medirParallax() {
-    if (quieto) return;
-    var vh = window.innerHeight;
-
-    parallaxEls.forEach(function (img) {
-      var box = img.parentElement.getBoundingClientRect();
-      if (box.bottom < -50 || box.top > vh + 50) return;
-      var progreso = (vh - box.top) / (vh + box.height);   // 0 entrando, 1 saliendo
-      progreso = Math.min(1, Math.max(0, progreso));
-      img.style.setProperty('--par', (-12 * progreso).toFixed(2) + '%');
-    });
-    ticking = false;
-  }
-
-  function alScroll() {
-    if (!ticking) { ticking = true; requestAnimationFrame(medirParallax); }
-  }
-
-  /* Barra de progreso de lectura. */
   function barraProgreso() {
     var bar = document.getElementById('progress');
     if (!bar) return;
@@ -138,7 +111,6 @@
     pintar();
   }
 
-  /* Los números de la portada suben desde cero cuando aparecen. */
   function contadores() {
     document.querySelectorAll('[data-count]').forEach(function (el) {
       var fin = Number(el.dataset.count);
@@ -151,8 +123,7 @@
         var t0 = performance.now();
         (function paso(now) {
           var p = Math.min(1, (now - t0) / 900);
-          var suave = 1 - Math.pow(1 - p, 3);
-          el.textContent = Math.round(fin * suave);
+          el.textContent = Math.round(fin * (1 - Math.pow(1 - p, 3)));
           if (p < 1) requestAnimationFrame(paso);
         })(t0);
       }, { threshold: 0.5 });
@@ -160,38 +131,34 @@
     });
   }
 
-  /* FLIP: al cambiar de filtro las fichas se deslizan a su nueva posición
-     en vez de saltar. Medimos antes, aplicamos, medimos después, animamos la diferencia. */
+  /* Al filtrar, las filas se deslizan a su nueva posición en vez de saltar. */
   function flip(cambiar) {
-    var cards = [].slice.call(document.querySelectorAll('.card'));
-
+    var filas = [].slice.call(document.querySelectorAll('.entry'));
     if (quieto || !document.body.animate) return cambiar();
 
     var antes = new Map();
-    cards.forEach(function (c) {
-      if (c.style.display !== 'none') antes.set(c, c.getBoundingClientRect());
+    filas.forEach(function (f) {
+      if (f.style.display !== 'none') antes.set(f, f.getBoundingClientRect().top);
     });
 
     cambiar();
 
-    cards.forEach(function (c) {
-      if (c.style.display === 'none') return;
-      var previo = antes.get(c);
-      var ahora = c.getBoundingClientRect();
-      if (!previo) {
-        c.animate([{ opacity: 0, transform: 'scale(.96)' }, { opacity: 1, transform: 'none' }],
-          { duration: 420, easing: EASE });
+    filas.forEach(function (f) {
+      if (f.style.display === 'none') return;
+      var previo = antes.get(f);
+      var ahora = f.getBoundingClientRect().top;
+      if (previo == null) {
+        f.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 380, easing: EASE });
         return;
       }
-      var dx = previo.left - ahora.left;
-      var dy = previo.top - ahora.top;
-      if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return;
-      c.animate([{ transform: 'translate(' + dx + 'px,' + dy + 'px)' }, { transform: 'none' }],
-        { duration: 520, easing: EASE });
+      var dy = previo - ahora;
+      if (Math.abs(dy) < 1) return;
+      f.animate([{ transform: 'translateY(' + dy + 'px)' }, { transform: 'none' }],
+        { duration: 480, easing: EASE });
     });
   }
 
-  /* ================================================================ fichas */
+  /* ============================================================== entradas */
 
   /* Jerarquía del botón sólido: reservar > web > mapa. Solo uno por ficha. */
   function accionPrincipal(r) {
@@ -216,29 +183,13 @@
     } else if (r.reservationType === 'walk-in') {
       out.push('<span class="walkin">Por orden de llegada</span>');
     }
-    /* reservationType "unknown": no mostramos nada antes que mostrar un botón falso. */
+    /* reservationType "unknown": no mostramos nada antes que un botón falso. */
 
     if (r.instagram) act('instagram', r.instagram, 'Instagram', ' target="_blank" rel="noopener"');
     if (r.phone) act('phone', 'tel:' + r.phone, 'Tel.');
     if (r.maps) act('maps', r.maps, 'Mapa', ' target="_blank" rel="noopener"');
 
     return out.join('');
-  }
-
-  function scoreHtml(r) {
-    if (r.googleRating == null) {
-      return '<a class="score" href="' + esc(r.maps) + '" target="_blank" rel="noopener">' +
-        '<span class="score-src">Google</span>' +
-        '<span class="score-pending">Ver en Google Maps →</span></a>';
-    }
-    var when = r.updatedAt
-      ? '<p class="score-when">Actualizado ' + new Date(r.updatedAt).toLocaleDateString('es-CL') + '</p>'
-      : '';
-    return '<a class="score" href="' + esc(r.maps) + '" target="_blank" rel="noopener" ' +
-      'aria-label="Ver ' + esc(r.name) + ' en Google Maps">' +
-      '<span class="score-src">Google</span>' +
-      '<span class="score-v"><span class="star" aria-hidden="true">★</span>' + rating(r.googleRating) +
-      '<span class="score-n">' + reviews(r.googleReviewCount) + ' reseñas</span></span></a>' + when;
   }
 
   function factsHtml(r) {
@@ -252,31 +203,78 @@
     }).join('') + '</dl>';
   }
 
-  function cardHtml(r, i) {
-    return '<li class="card" id="card-' + esc(r.id) + '" data-id="' + esc(r.id) + '" ' +
-      'data-comuna="' + esc(r.comuna) + '">' +
-        '<figure class="shot" data-photo></figure>' +
-        '<div class="card-body">' +
-          '<div class="folio">' +
-            '<span class="n">' + String(i + 1).padStart(2, '0') + '</span>' +
-            '<span class="where">' + esc(r.comuna) + '</span>' +
-          '</div>' +
-          '<h3>' + esc(r.name) + '</h3>' +
-          '<p class="kind">' + esc(r.category) + '</p>' +
+  function scoreHtml(r) {
+    if (r.googleRating == null) return '<span class="row-none">Sin nota aún</span>';
+    return '<span class="star" aria-hidden="true">★</span>' + rating(r.googleRating) +
+      '<span class="row-rev">' + reviews(r.googleReviewCount) + ' reseñas</span>';
+  }
+
+  /* Etiqueta para lectores de pantalla: el ★ y los números sueltos no se leen bien. */
+  function scoreAria(r) {
+    if (r.googleRating == null) return 'sin nota de Google todavía';
+    return 'nota de Google ' + rating(r.googleRating) + ' con ' +
+      reviews(r.googleReviewCount) + ' reseñas';
+  }
+
+  function entryHtml(r, i) {
+    var id = esc(r.id);
+    var fuente = r.updatedAt
+      ? 'Fuente: Google · actualizado ' + new Date(r.updatedAt).toLocaleDateString('es-CL')
+      : 'Fuente: Google · puntuación y número de reseñas';
+
+    return '<li class="entry" id="card-' + id + '" data-comuna="' + esc(r.comuna) + '">' +
+      '<h3 class="entry-h">' +
+        '<button type="button" class="row" aria-expanded="false" aria-controls="d-' + id + '">' +
+          '<span class="row-n">' + String(i + 1).padStart(2, '0') + '</span>' +
+          '<span class="row-main">' +
+            '<span class="row-name">' + esc(r.name) + '</span>' +
+            '<span class="row-meta">' + esc(r.comuna) + ' · ' + esc(r.category) + '</span>' +
+          '</span>' +
+          '<span class="row-score">' + scoreHtml(r) + '</span>' +
+          '<span class="sr-only">, ' + esc(scoreAria(r)) + '</span>' +
+          '<span class="row-plus"></span>' +
+        '</button>' +
+      '</h3>' +
+      '<div class="detail" id="d-' + id + '">' +
+        '<div class="detail-clip"><div class="detail-in">' +
           '<p class="blurb">' + esc(r.description) + '</p>' +
           (r.badge ? '<span class="stamp">' + esc(r.badge) + '</span>' : '') +
           factsHtml(r) +
-          scoreHtml(r) +
           '<div class="acts">' + accionesHtml(r) + '</div>' +
-        '</div>' +
-      '</li>';
+          '<p class="source">' + esc(fuente) + '</p>' +
+        '</div></div>' +
+      '</div>' +
+    '</li>';
   }
 
-  function renderCards() {
-    document.getElementById('grid').innerHTML = state.list.map(cardHtml).join('');
-    document.querySelectorAll('.card').forEach(function (card, i) {
-      observarReveal(card, Math.min(i, 5) * 70);
+  function renderIndice() {
+    var lista = document.getElementById('index');
+    lista.innerHTML = state.list.map(entryHtml).join('');
+
+    lista.querySelectorAll('.entry').forEach(function (entry, i) {
+      observarReveal(entry, Math.min(i, 6) * 55);
     });
+
+    lista.addEventListener('click', function (e) {
+      var btn = e.target.closest('.row');
+      if (btn) alternar(btn);
+    });
+  }
+
+  /* Acordeón: una sola entrada abierta a la vez, como un índice de verdad. */
+  function alternar(btn) {
+    var entry = btn.closest('.entry');
+    var abierta = entry.classList.contains('is-open');
+
+    document.querySelectorAll('.entry.is-open').forEach(function (otra) {
+      otra.classList.remove('is-open');
+      otra.querySelector('.row').setAttribute('aria-expanded', 'false');
+    });
+
+    if (!abierta) {
+      entry.classList.add('is-open');
+      btn.setAttribute('aria-expanded', 'true');
+    }
   }
 
   /* =============================================================== filtros */
@@ -284,23 +282,6 @@
   function visibles() {
     if (state.filter === 'all') return state.list;
     return state.list.filter(function (r) { return r.comuna === state.filter; });
-  }
-
-  /* Ritmo de revista: la primera ficha abre a lo ancho y dos del medio se
-     ensanchan para romper la retícula. Se recalcula con cada filtro. */
-  function ritmoEditorial() {
-    var todas = [].slice.call(document.querySelectorAll('.card'));
-    /* Limpiamos también las ocultas: si no, conservan el ritmo del filtro anterior
-       y reaparecen con el ancho equivocado. */
-    todas.forEach(function (c) { c.classList.remove('card--lead', 'card--wide'); });
-
-    var vivos = todas.filter(function (c) { return c.style.display !== 'none'; });
-    vivos.forEach(function (c, i) {
-      /* La primera abre a lo ancho; después una cada siete, para que la
-         retícula de dos columnas no se vuelva monótona. */
-      if (i === 0) c.classList.add('card--lead');
-      else if (vivos.length > 6 && (i + 1) % 7 === 0) c.classList.add('card--wide');
-    });
   }
 
   function renderFilters() {
@@ -330,14 +311,16 @@
     });
 
     flip(function () {
-      document.querySelectorAll('.card').forEach(function (card) {
-        var on = value === 'all' || card.dataset.comuna === value;
-        card.style.display = on ? '' : 'none';
-        card.hidden = !on;
-        /* No forzamos .is-in: el observer sigue activo y la revela cuando entra
-           en pantalla, así el reveal escalonado se mantiene al filtrar. */
+      document.querySelectorAll('.entry').forEach(function (entry) {
+        var on = value === 'all' || entry.dataset.comuna === value;
+        entry.style.display = on ? '' : 'none';
+        entry.hidden = !on;
+        if (!on) {
+          /* Una entrada oculta no debe quedar abierta al reaparecer. */
+          entry.classList.remove('is-open');
+          entry.querySelector('.row').setAttribute('aria-expanded', 'false');
+        }
       });
-      ritmoEditorial();
     });
 
     var n = visibles().length;
@@ -345,196 +328,6 @@
     document.getElementById('tally').innerHTML =
       '<b>' + n + '</b> ' + (n === 1 ? 'local' : 'locales') +
       (value === 'all' ? ' en la guía' : ' en ' + esc(value));
-
-    sincronizarMapa();
-    medirParallax();
-  }
-
-  /* ================================================================== mapa */
-
-  function cuandoMaps() {
-    return new Promise(function (resolve, reject) {
-      if (window.__mapsReady) return resolve();
-      window.__onMapsReady = resolve;
-      setTimeout(function () {
-        if (!window.__mapsReady) reject(new Error('Google Maps no cargó'));
-      }, 12000);
-    });
-  }
-
-  function icono() {
-    return {
-      path: 'M0-17C-9.4-17-17-9.4-17 0c0 12.2 17 28 17 28S17 12.2 17 0C17-9.4 9.4-17 0-17z',
-      fillColor: '#C9A227',
-      fillOpacity: 1,
-      strokeColor: '#0B0A09',
-      strokeWeight: 3,
-      scale: 0.82,
-      anchor: new google.maps.Point(0, 28)
-    };
-  }
-
-  function ponerMarcador(r) {
-    if (state.markers[r.id] || r.lat == null || r.lng == null) return;
-
-    var marker = new google.maps.Marker({
-      position: { lat: r.lat, lng: r.lng }, map: state.map, title: r.name,
-      icon: icono(), animation: quieto ? null : google.maps.Animation.DROP
-    });
-
-    marker.addListener('click', function () {
-      state.info.setContent(
-        '<div class="gm-popup"><strong>' + esc(r.name) + '</strong>' +
-        '<small>' + esc(r.category) + ' · ' + esc(r.comuna) + '</small>' +
-        (r.googleRating != null
-          ? '<small>★ ' + rating(r.googleRating) + ' · ' + reviews(r.googleReviewCount) + ' reseñas</small>'
-          : '') + '</div>');
-      state.info.open({ map: state.map, anchor: marker });
-    });
-
-    state.markers[r.id] = marker;
-    sincronizarMapa();
-  }
-
-  /* Solo los marcadores del filtro activo, y el mapa encuadrado en ellos. */
-  function sincronizarMapa() {
-    if (!state.map) return;
-
-    var ids = {};
-    visibles().forEach(function (r) { ids[r.id] = true; });
-
-    var bounds = new google.maps.LatLngBounds();
-    var n = 0;
-
-    Object.keys(state.markers).forEach(function (id) {
-      var on = !!ids[id];
-      state.markers[id].setMap(on ? state.map : null);
-      if (on) { bounds.extend(state.markers[id].getPosition()); n++; }
-    });
-
-    if (n === 0) { state.map.setCenter(SANTIAGO); state.map.setZoom(12); }
-    else if (n === 1) { state.map.panTo(bounds.getCenter()); state.map.setZoom(16); }
-    else state.map.fitBounds(bounds, { top: 48, right: 48, bottom: 48, left: 48 });
-  }
-
-  async function iniciarMapa() {
-    try {
-      await cuandoMaps();
-    } catch (error) {
-      document.getElementById('mapShell').dataset.state = 'error';
-      console.warn(error.message);
-      return;
-    }
-
-    var core = await google.maps.importLibrary('core');
-    var maps = await google.maps.importLibrary('maps');
-
-    state.map = new maps.Map(document.getElementById('map'), {
-      center: SANTIAGO, zoom: 12,
-      colorScheme: core.ColorScheme.DARK,
-      streetViewControl: false, mapTypeControl: false,
-      fullscreenControl: true, gestureHandling: 'greedy'
-    });
-    state.info = new google.maps.InfoWindow();
-    document.getElementById('mapShell').dataset.state = 'ready';
-
-    /* Coordenadas ya guardadas en restaurants.json (las escribe el job semanal). */
-    state.list.forEach(ponerMarcador);
-
-    /* Para el resto, una sola consulta a Places trae foto, coordenadas y place_id. */
-    for (var i = 0; i < state.list.length; i++) await traerDePlaces(state.list[i]);
-  }
-
-  /* ==================================================== fotos + place_id */
-
-  function clave(r) { return 'guia:place:' + r.id; }
-
-  function leerCache(r) {
-    try { return JSON.parse(sessionStorage.getItem(clave(r))); } catch (e) { return null; }
-  }
-  function guardarCache(r, v) {
-    try { sessionStorage.setItem(clave(r), JSON.stringify(v)); } catch (e) { /* sin storage */ }
-  }
-
-  /* Si Google no entrega foto, la ficha muestra la inicial en Playfair
-     en vez de un hueco: la retícula no se rompe y no inventamos una imagen. */
-  function pintarSinFoto(r) {
-    var card = document.getElementById('card-' + r.id);
-    var hueco = card && card.querySelector('[data-photo]');
-    if (!hueco || hueco.dataset.done) return;
-    hueco.dataset.done = '1';
-    hueco.classList.add('shot--none');
-    var ini = document.createElement('span');
-    ini.className = 'initial';
-    ini.setAttribute('aria-hidden', 'true');
-    ini.textContent = r.name.trim().charAt(0).toUpperCase();
-    hueco.appendChild(ini);
-  }
-
-  function pintarFoto(r, url, autor, autorUrl) {
-    var card = document.getElementById('card-' + r.id);
-    var hueco = card && card.querySelector('[data-photo]');
-    if (!hueco || hueco.dataset.done) return;
-    if (!url) return pintarSinFoto(r);
-    hueco.dataset.done = '1';
-
-    var img = new Image();
-    img.alt = 'Foto de ' + r.name;
-    img.loading = 'lazy';
-    img.src = url;
-    hueco.appendChild(img);
-    parallaxEls.push(img);
-    img.addEventListener('load', medirParallax, { once: true });
-
-    var cap = document.createElement('figcaption');
-    if (autorUrl) {
-      var a = document.createElement('a');
-      a.href = autorUrl; a.target = '_blank'; a.rel = 'noopener noreferrer';
-      a.textContent = autor || 'Google Maps';
-      cap.appendChild(a);
-    } else cap.textContent = autor || 'Google Maps';
-    hueco.appendChild(cap);
-  }
-
-  async function traerDePlaces(r) {
-    var cached = leerCache(r);
-    if (cached) {
-      if (r.lat == null && cached.lat != null) { r.lat = cached.lat; r.lng = cached.lng; }
-      ponerMarcador(r);
-      pintarFoto(r, cached.photoUrl, cached.creditName, cached.creditUrl);
-      return;
-    }
-
-    try {
-      var lib = await google.maps.importLibrary('places');
-      var res = await lib.Place.searchByText({
-        textQuery: r.name + ', ' + (r.addressFull || r.address),
-        fields: ['id', 'location', 'photos'],
-        includedType: 'restaurant', maxResultCount: 1,
-        language: 'es-419', region: 'CL'
-      });
-
-      var place = res.places && res.places[0];
-      if (!place) return pintarSinFoto(r);
-
-      var photo = place.photos && place.photos[0];
-      var attr = photo && photo.authorAttributions && photo.authorAttributions[0];
-      var payload = {
-        lat: place.location ? place.location.lat() : null,
-        lng: place.location ? place.location.lng() : null,
-        photoUrl: photo ? photo.getURI({ maxWidth: 1400, maxHeight: 1050 }) : null,
-        creditName: attr ? attr.displayName : null,
-        creditUrl: attr ? attr.uri : null
-      };
-
-      guardarCache(r, payload);
-      if (r.lat == null && payload.lat != null) { r.lat = payload.lat; r.lng = payload.lng; }
-      ponerMarcador(r);
-      pintarFoto(r, payload.photoUrl, payload.creditName, payload.creditUrl);
-    } catch (error) {
-      console.warn('Places no respondió para ' + r.name + ':', error.message);
-      pintarSinFoto(r);
-    }
   }
 
   /* ================================================================== boot */
@@ -560,14 +353,9 @@
       return;
     }
 
-    renderCards();
+    renderIndice();
     renderFilters();
     aplicarFiltro('all');
-
-    window.addEventListener('scroll', alScroll, { passive: true });
-    window.addEventListener('resize', medirParallax);
-
-    iniciarMapa();
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);

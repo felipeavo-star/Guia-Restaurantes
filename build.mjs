@@ -9,10 +9,10 @@ const RESERVATION_TYPES = new Set(['online', 'walk-in', 'unknown']);
 const COMUNAS = new Set(['Providencia', 'Vitacura', 'Las Condes', 'Santiago Centro']);
 const REQUIRED = ['id', 'name', 'comuna', 'category', 'description', 'address', 'maps', 'reservationType'];
 
-const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-if (!apiKey) {
-  throw new Error('GOOGLE_MAPS_API_KEY no está configurada en el entorno de build.');
-}
+/* La página ya no carga Google Maps ni Places en el navegador: el mapa se quitó
+   y las notas las escribe el job semanal del servidor. Por eso el build ya no
+   necesita GOOGLE_MAPS_API_KEY. La variable puede seguir en Vercel sin efecto;
+   el job de GitHub Actions sí la usa. */
 
 const restaurants = JSON.parse(await readFile('restaurants.json', 'utf8'));
 const problems = [];
@@ -53,7 +53,6 @@ const source = await readFile('index.html', 'utf8');
 let output = source;
 
 for (const [token, value] of [
-  ['__GOOGLE_MAPS_API_KEY__', apiKey],
   ['__RESTAURANTS_JSON__', JSON.stringify(publicData)]
 ]) {
   if (!output.includes(token)) throw new Error(`No se encontró el placeholder ${token} en index.html.`);
@@ -70,7 +69,7 @@ for (const file of ['app.js', 'restaurants.json']) {
 }
 
 const pending = restaurants.filter((r) => r.pendingReview);
-console.log(`Build OK · ${restaurants.length} restaurantes · API key inyectada.`);
+console.log(`Build OK · ${restaurants.length} restaurantes · sin dependencias de Google en el navegador.`);
 if (pending.length) {
   console.log(`Pendientes de verificación: ${pending.map((r) => r.name).join(', ')}`);
 }
